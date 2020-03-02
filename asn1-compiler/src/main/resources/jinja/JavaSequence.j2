@@ -1,0 +1,273 @@
+{%- set __jclass_identifier__                   = jclass:identifier(jclass.identifier)                               -%}
+{%- set __jclass_interfaces__                   = jclass:interfaces(__jclass_identifier__)                           -%}
+package generated.asn1;
+
+import java.io.*;
+import java.math.*;
+import java.util.*;
+import org.bouncycastle.asn1.*;
+
+
+@javax.annotation.processing.Generated("JavaSequence.j2")
+public class {{ __jclass_identifier__ }}
+        implements ASN1Encodable
+        {%- for jinterface in __jclass_interfaces__ -%}
+        , {{ jinterface }}
+        {%- endfor %} {
+
+    private byte[] rawInput;
+{%- for field in jclass.fields %}
+    {%- if field.objectIdentifier %}
+    private final ObjectIdentifiers {{ field.identifier }} = ObjectIdentifiers.{{ field.value }};
+
+    {%- elif field.javaType == 'List' %}
+    public List<{{ field.javaTypeParameter }}> {{ field.identifier }};
+
+    {%- else %}
+    private {{ field.javaType }} {{ field.identifier }};
+
+    {%- endif -%}
+{% endfor %}
+{%- for field in jclass.fields %}{%- if field.objectIdentifier %}
+    public ObjectIdentifiers get{{ jclass:identifier(field.identifier) }}() {
+        return {{ field.identifier }};
+    }
+{%- endif -%}{% endfor %}
+
+    public byte[] getRawInput() {
+        return rawInput;
+    }
+
+    public void setRawInput(byte[] rawInput) {
+        this.rawInput=rawInput;
+    }
+{%  for field in jclass.fields %}{%- if not field.objectIdentifier %}
+{%- set __jclass_field__                        = jclass:identifier(field.identifier)                                -%}
+    public {{ field.javaType }} get{{ __jclass_field__ }}() {
+        return {{ field.identifier }};
+    }
+
+    public void set{{ __jclass_field__ }}({{ field.javaType }} {{ field.identifier }}) {
+        this.{{ field.identifier }} = {{ field.identifier }};
+    }
+
+{%- endif -%}{% endfor %}
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector items = new ASN1EncodableVector();
+{% for field in jclass.fields %}
+        {%- if field.schemaType and field.tagged %}
+        if ({{ field.identifier }}!=null) items.add(new DERTaggedObject(false, {{ field.tagClassNumber }}, {{ field.identifier }}.toASN1Primitive()));
+
+        {%- elif field.javaType == 'List' %}
+        items.add(new DERSequence({{ field.identifier }}.stream().map(it-> it.toASN1Primitive()).toArray(ASN1Encodable[]::new)));
+
+        {%- elif field.schemaType %}
+        items.add({{ field.identifier }}.toASN1Primitive());
+
+        {%- elif field.tagged %}
+        if ({{ field.identifier }}!=null) items.add(new DERTaggedObject(false, {{ field.tagClassNumber }}, new {{ field.asnType }}({{ field.identifier }})));
+
+        {%- else %}
+        items.add(new {{ field.asnType }}({{ field.identifier }}));
+
+        {%- endif -%}
+{%- endfor %}
+
+        return new DERSequence(items);
+    }
+
+    public String encodeBase64() {
+        return Base64.getEncoder().encodeToString(encodeByteArray());
+    }
+
+    public byte[] encodeByteArray() {
+        try {
+            return checkedEncodeByteArray();
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public byte[] checkedEncodeByteArray() throws IOException {
+        return toASN1Primitive().getEncoded(ASN1Encoding.DER);
+    }
+
+    private static ASN1Encodable readObject(ASN1SequenceParser parser) throws IOException {
+        ASN1Encodable object = parser.readObject();
+        if (object instanceof InMemoryRepresentable) {
+            object = ((InMemoryRepresentable)object).getLoadedObject();
+        }
+
+        return object;
+    }
+
+    private static ASN1Encodable loadSequenceParser(ASN1SequenceParser parser) throws IOException {
+        ASN1Encodable object = parser.readObject();
+
+        if (!(object instanceof ASN1SequenceParser) && object instanceof InMemoryRepresentable) {
+            object = ((InMemoryRepresentable)object).getLoadedObject();
+        }
+
+        return object;
+    }
+
+    private static byte[] getEncoded(ASN1Encodable encodable) {
+        try {
+            return checkedGetEncoded(encodable);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    private static byte[] checkedGetEncoded(ASN1Encodable encodable) throws IOException {
+        ASN1Encodable object = encodable;
+
+        if (encodable instanceof DLSequenceParser) {
+            object = ((DLSequenceParser)encodable).getLoadedObject();
+        }
+
+        return object.toASN1Primitive().getEncoded();
+    }
+
+    public {{ __jclass_identifier__ }} decodeByteArray(byte[] bytes) {
+        try {
+            return checkedDecodeByteArray(bytes);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public {{ __jclass_identifier__ }} checkedDecodeByteArray(byte[] bytes) throws IOException {
+        {{ __jclass_identifier__ }}  target = this;
+        target.rawInput = bytes;
+
+        DLSequenceParser parser = (DLSequenceParser)new ASN1StreamParser(bytes).readObject();
+        ASN1Encodable object = loadSequenceParser(parser);
+{% for field in jclass.fields %}
+        {%- if field.tagged && field.optional %}
+        object = target.{{ field.identifier }}ReadOptionalTagged(target, parser, object);
+
+        {%- elif field.tagged && !field.optional %}
+        object = target.{{ field.identifier }}ReadRequiredTagged(target, parser, object);
+
+        {%- elif !field.tagged && !field.optional %}
+        object = target.{{ field.identifier }}ReadRequired(target, parser, object);
+
+        {%- else %}
+        throw new UnsupportedOperationException();
+
+        {% endif -%}
+{% endfor %}
+
+        return target;
+    }
+{%- for field in jclass.fields %}
+{%- if field.tagged && field.optional %}
+
+    private ASN1Encodable {{ field.identifier }}ReadOptionalTagged({{ __jclass_identifier__ }} target, DLSequenceParser parser, ASN1Encodable object) throws IOException {
+        if (!(object instanceof DLTaggedObject)) return object;
+
+        DLTaggedObject taggedObject = (DLTaggedObject) object;
+
+        if (taggedObject.getTagNo() != {{ field.tagClassNumber }}) return object;
+
+        {%- if field.javaType == 'BigInteger' %}
+        target.{{ field.identifier }} = new ASN1Integer(((ASN1OctetString)taggedObject.getObject()).getOctets()).value;
+
+        {%- elif field.javaType == 'String' %}
+        target.{{ field.identifier }} = org.bouncycastle.util.Strings.fromByteArray(((ASN1OctetString)taggedObject.getObject()).getOctets());
+
+        {%- elif field.schemaType %}
+        byte[] encoded = taggedObject.getObject().getEncoded();
+        target.{{ field.identifier }} = new {{ field.javaType }}().decodeByteArray(encoded);
+
+        {%- else %}
+        throw new UnsupportedOperationException();
+
+        {%- endif %}
+
+        return readObject(parser);
+    }
+{%- elif field.tagged && !field.optional %}
+
+    private ASN1Encodable {{ field.identifier }}ReadRequiredTagged({{ __jclass_identifier__ }} target, DLSequenceParser parser, ASN1Encodable object) throws IOException {
+        if (!(object instanceof DLTaggedObject)) {
+            throw new UnsupportedOperationException();
+        }
+
+        DLTaggedObject taggedObject = (DLTaggedObject)object;
+
+        if (taggedObject.getTagNo() != {{ field.tagClassNumber }}) {
+            throw new UnsupportedOperationException();
+        }
+
+        {%- if field.javaType == 'BigInteger' %}
+        target.{{ field.identifier }} = new ASN1Integer(((ASN1OctetString)taggedObject.getObject()).getOctets()).getValue();
+
+        {%- elif field.javaType == 'String' %}
+        target.{{ field.identifier }} = org.bouncycastle.util.Strings.fromByteArray(((ASN1OctetString)taggedObject.getObject()).getOctets());
+
+        {%- elif field.schemaType %}
+        byte[] encoded = taggedObject.getObject().getEncoded();
+        target.{{ field.identifier }} = new {{ field.javaType }}().decodeByteArray(encoded);
+
+{%- else %}
+        throw new UnsupportedOperationException();
+
+        {%- endif %}
+
+        return readObject(parser);
+    }
+{%- else %}
+
+    private ASN1Encodable {{ field.identifier }}ReadRequired({{ __jclass_identifier__ }} target, DLSequenceParser parser, ASN1Encodable object) throws IOException {
+        {%- if field.objectIdentifier %}
+        final ObjectIdentifiers {{ field.identifier }} = ObjectIdentifiers.{{ field.value }};
+
+        if (!ObjectIdentifiers.{{ field.value }}.toASN1Primitive().equals(object)) {
+            throw new ASN1ParsingException("Expected object identifier: " + ObjectIdentifiers.{{ field.value }} + ", actual value " + object);
+        }
+
+        {%- elif field.javaType == 'BigInteger' %}
+        target.{{ field.identifier }} = ((ASN1Integer)object).getValue();
+
+        {%- elif field.javaType == 'String' %}
+        target.{{ field.identifier }} = ((ASN1String)object).getString();
+
+        {%- elif field.javaType == 'byte[]' %}
+        target.{{ field.identifier }} = ((ASN1OctetString)object).getOctets();
+
+        {%- elif field.javaType == 'List' %}
+        target.{{ field.identifier }} = new ArrayList<{{ field.javaTypeParameter }}>();
+        ASN1Sequence listSequence = (ASN1Sequence) object;
+
+        for (int i=0; i<listSequence.size(); i++) {
+            var it = listSequence.getObjectAt(i);
+            byte[] itemBytes = getEncoded(it);
+            {{ field.javaTypeParameter }} itemValue = new {{ field.javaTypeParameter }}();
+
+            itemValue.decodeByteArray(itemBytes);
+            target.{{ field.identifier }}.add(itemValue);
+        }
+
+        {%- elif field.schemaType %}
+        byte[] encoded = getEncoded(object);
+        {{ field.javaType}} value = new {{ field.javaType}}();
+
+        value.decodeByteArray(encoded);
+        target.{{ field.identifier }} = value;
+
+        {%- else %}
+        throw new UnsupportedOperationException();
+
+        {%- endif %}
+
+        return readObject(parser);
+    }
+
+{%- endif -%}
+{% endfor %}
+
+}

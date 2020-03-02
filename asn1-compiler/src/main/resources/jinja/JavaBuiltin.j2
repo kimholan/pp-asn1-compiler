@@ -1,0 +1,88 @@
+{%- set __jclass_identifier__                   = jclass:identifier(jclass.identifier)                               -%}
+{%- set __jclass_interfaces__                   = jclass:interfaces(__jclass_identifier__)                           -%}
+package generated.asn1;
+
+import java.io.*;
+import java.math.*;
+import java.util.*;
+import org.bouncycastle.asn1.*;
+
+
+@javax.annotation.processing.Generated("JavaBuiltin.j2")
+public class {{ __jclass_identifier__   }}
+        implements ASN1Encodable
+        {%- for jinterface in __jclass_interfaces__ -%}
+        , {{ jinterface }}
+        {%- endfor %} {
+
+    private byte[] rawInput;
+
+    private {{ jclass.javaType }} value;
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        return new {{ jclass.asnType }}(value);
+    }
+
+    public byte[] getRawInput() {
+        return rawInput;
+    }
+
+    public void setRawInput(byte[] rawInput) {
+        this.rawInput=rawInput;
+    }
+
+    public {{ jclass.javaType }} getValue() {
+        return value;
+    }
+
+    public void setValue({{ jclass.javaType }} value) {
+        this.value = value;
+    }
+
+    public String encodeBase64() {
+        return Base64.getEncoder().encodeToString(encodeByteArray());
+    }
+
+    public byte[] encodeByteArray() {
+        try {
+            return checkedEncodeByteArray();
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public byte[] checkedEncodeByteArray() throws IOException {
+        return toASN1Primitive().getEncoded(ASN1Encoding.DER);
+    }
+
+    public {{ __jclass_identifier__ }} decodeByteArray(byte[] bytes) {
+        try {
+            return checkedDecodeByteArray(bytes);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public {{ __jclass_identifier__ }} checkedDecodeByteArray(byte[] bytes) throws IOException {
+        {{ __jclass_identifier__ }} target = this;
+        target.rawInput = bytes;
+
+        Object asnValue = ((InMemoryRepresentable)new ASN1InputStream(bytes).readObject()).getLoadedObject();
+
+        {%- if jclass.javaType == 'String' %}
+        target.value = ((ASN1String)asnValue).getString();
+
+        {%- elif jclass.javaType == 'byte[]' %}
+        target.value = ((ASN1OctetString)asnValue).getOctets();
+
+        {%- else %}
+        throw new UnsupportedOperationException();
+
+        {%- endif %}
+
+        return target;
+    }
+
+}
+

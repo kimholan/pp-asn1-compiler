@@ -1,0 +1,29 @@
+{%- set __jclass_identifier__                   = jclass:identifier(jenum.identifier)                                -%}
+package generated.asn1;
+
+import org.bouncycastle.asn1.*;
+
+@javax.annotation.processing.Generated("JavaEnum.j2")
+public enum {{ __jclass_identifier__ }}
+        implements ASN1Encodable {
+
+{% for field in jenum.fields %}
+    {{ jconstant:identifier(field.identifier) }}("{{ field.value }}"){% if loop.last %};{% else %},{% endif %}
+{% endfor %}
+
+    private ASN1ObjectIdentifier asn1ObjectIdentifier;
+
+    ObjectIdentifiers(String oid) {
+        this.asn1ObjectIdentifier = new ASN1ObjectIdentifier(oid);
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        return asn1ObjectIdentifier.toASN1Primitive();
+    }
+
+    public String getId() {
+        return asn1ObjectIdentifier.getId();
+    }
+
+}

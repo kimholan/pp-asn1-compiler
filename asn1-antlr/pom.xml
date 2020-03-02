@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>asn1</artifactId>
+    <groupId>sk.kimholan</groupId>
+    <version>next-version</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>asn1-antlr</artifactId>
+  <version>next-version</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+      <!-- fork generating the lexer/parser due to System.exit in Tool -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <target>
+            <java classname="org.antlr.v4.Tool" fork="true">
+              <classpath>
+                <path refid="maven.compile.classpath"/>
+                <path refid="maven.plugin.classpath"/>
+              </classpath>
+              <arg value="-o"/>
+              <arg value="${project.basedir}/target/generated-sources/generated/asn1/antlr"/>
+              <arg value="-Xexact-output-dir"/>
+              <arg value="-package"/>
+              <arg value="generated.asn1.antlr"/>
+              <arg value="-visitor"/>
+              <arg value="-listener"/>
+              <arg value="${project.basedir}/src/main/resources/ASN1.g4"/>
+            </java>
+          </target>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

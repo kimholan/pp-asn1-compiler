@@ -1,0 +1,124 @@
+{%- set __jclass_identifier__                   = jclass:identifier(jclass.identifier)                               -%}
+{%- set __jclass_interfaces__                   = jclass:interfaces(__jclass_identifier__)                           -%}
+package generated.asn1;
+
+import java.io.*;
+import java.math.*;
+import java.util.*;
+import org.bouncycastle.asn1.*;
+
+
+@javax.annotation.processing.Generated("JavaChoice.j2")
+public class {{ __jclass_identifier__ }}
+        implements ASN1Encodable
+        {%- for jinterface in __jclass_interfaces__ -%}
+        , {{ jinterface }}
+        {%- endfor %} {
+
+    private byte[] rawInput;
+{%-  for field in jclass.fields %}
+    private {{ field.javaType }} {{ field.identifier }};
+{%- endfor %}
+    public byte[] getRawInput() {
+        return rawInput;
+    }
+
+    public void setRawInput(byte[] rawInput) {
+        this.rawInput=rawInput;
+    }
+{%  for field in jclass.fields %}
+{%- set __jclass_field__                        = jclass:identifier(field.identifier)                                -%}
+    public {{ field.javaType }} get{{ __jclass_field__ }}() {
+        return {{ field.identifier }};
+    }
+
+    public void set{{ __jclass_field__ }}({{ field.javaType }} {{ field.identifier }}) {
+        {% for otherField in jclass.fields -%}{% if otherField.identifier != field.identifier -%}
+        this.{{ otherField.identifier }} = null;
+        {% endif %}{% endfor -%}
+        this.{{ field.identifier }} = {{ field.identifier }};
+    }
+
+    public boolean is{{ __jclass_field__ }}() {
+        return this.{{ field.identifier }} != null;
+    }
+{% endfor %}
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+{%- for field in jclass.fields %}
+{%- set __jclass_field__                        = jclass:identifier(field.identifier)                                -%}
+{%- if loop.first %}
+        if (is{{ __jclass_field__ }}()) { {%
+    else
+%} else if (is{{ __jclass_field__ }}()) { {%
+    endif
+%}
+             return valueToAsn1Primitive({{ field.identifier }});
+        }{%- endfor %}
+        throw new UnsupportedOperationException();
+    }
+
+    public String encodeBase64() {
+        return Base64.getEncoder().encodeToString(encodeByteArray());
+    }
+
+    public byte[] encodeByteArray() {
+        try {
+            return checkedEncodeByteArray();
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public byte[] checkedEncodeByteArray() throws IOException {
+        return toASN1Primitive().getEncoded(ASN1Encoding.DER);
+    }
+
+    public {{ __jclass_identifier__ }} decodeByteArray(byte[] bytes) {
+        try {
+            return checkedDecodeByteArray(bytes);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public {{ __jclass_identifier__ }} checkedDecodeByteArray(byte[] bytes) throws IOException {
+        {{ __jclass_identifier__ }} target = this;
+        target.rawInput = bytes;
+
+        ASN1Encodable anyValue = new ASN1StreamParser(bytes).readObject();
+        if (anyValue instanceof DEROctetStringParser) {
+            anyValue = ((DEROctetStringParser)anyValue).getLoadedObject();
+        }
+{%  for field in jclass.fields %}
+{%- if loop.first %}
+        if (anyValue instanceof {{ field.asnType }}) { {%
+    else
+%} else if (anyValue instanceof {{ field.asnType }}) { {%
+    endif
+%}
+            {{ field.identifier }} = ({{ field.javaType }}) valueFromAsn1Primitive(anyValue);
+        }{%- endfor %} else {
+            throw new UnsupportedOperationException();
+        }
+
+        return target;
+    }
+
+    private static ASN1Primitive valueToAsn1Primitive(Object value) {
+        if (value instanceof String) return new DERUTF8String((String)value);
+        if (value instanceof BigInteger) return new ASN1Integer((BigInteger)value);
+        if (value instanceof byte[]) return new DEROctetString((byte[])value);
+        throw new UnsupportedOperationException();
+    }
+
+    private static Object valueFromAsn1Primitive(ASN1Encodable asn1Encodable) {
+        if (asn1Encodable instanceof ASN1Integer) return ((ASN1Integer)asn1Encodable).getValue();
+        if (asn1Encodable instanceof ASN1String) return ((ASN1String)asn1Encodable).getString();
+        if (asn1Encodable instanceof ASN1OctetString) return ((ASN1OctetString)asn1Encodable).getOctets();
+        throw new UnsupportedOperationException();
+    }
+
+
+}
+

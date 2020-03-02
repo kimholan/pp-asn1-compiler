@@ -1,0 +1,110 @@
+{%- set __jclass_identifier__                   = jclass:identifier(jclass.identifier)                               -%}
+{%- set __jclass_interfaces__                   = jclass:interfaces(__jclass_identifier__)                           -%}
+{%- set __collection_identifier__               = jclass.fields[0].identifier                                        -%}
+{%- set __element_type__                        = jclass.fields[0].javaType                                          -%}
+package generated.asn1;
+
+import java.io.*;
+import java.math.*;
+import java.util.*;
+import org.bouncycastle.asn1.*;
+
+
+@javax.annotation.processing.Generated("JavaSequenceOf.j2")
+public class {{ __jclass_identifier__ }}
+        implements ASN1Encodable
+        {%- for jinterface in __jclass_interfaces__ -%}
+        , {{ jinterface }}
+        {%- endfor %} {
+
+    private byte[] rawInput;
+    public List<{{ __element_type__ }}> {{ __collection_identifier__ }};
+
+    public byte[] getRawInput() {
+        return rawInput;
+    }
+
+    public void setRawInput(byte[] rawInput) {
+        this.rawInput=rawInput;
+    }
+
+{%- set __collection_identifier_field__         = jclass:identifier(jclass.fields[0].identifier )                    -%}
+    public List<{{ __element_type__ }}> get{{ __collection_identifier_field__ }}() {
+        return {{ __collection_identifier__ }};
+    }
+
+    public void set{{ __collection_identifier_field__ }}(List<{{ __element_type__ }}> {{ __collection_identifier__ }}) {
+        this.{{ __collection_identifier__ }} = {{ __collection_identifier__ }};
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        return new DERSequence({{ __collection_identifier__ }}.stream().map(it-> it.toASN1Primitive()).toArray(ASN1Encodable[]::new));
+    }
+
+    private static byte[] getEncoded(ASN1Encodable encodable) {
+        try {
+            return checkedGetEncoded(encodable);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    private static byte[] checkedGetEncoded(ASN1Encodable encodable) throws IOException {
+        ASN1Encodable object = encodable;
+
+        if (encodable instanceof DLSequenceParser) {
+            object = ((DLSequenceParser)encodable).getLoadedObject();
+        }
+
+        return object.toASN1Primitive().getEncoded();
+    }
+
+    private static ASN1Encodable readObject(ASN1StreamParser parser) throws IOException {
+        ASN1Encodable object = parser.readObject();
+        if (object instanceof InMemoryRepresentable) {
+            object = ((InMemoryRepresentable)object).getLoadedObject();
+        }
+
+        return object;
+    }
+
+    public {{ __jclass_identifier__ }} decodeByteArray(byte[] bytes) {
+        try {
+            return checkedDecodeByteArray(bytes);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public {{ __jclass_identifier__ }} checkedDecodeByteArray(byte[] bytes) throws IOException {
+        {{ __jclass_identifier__ }} target = this;
+        target.rawInput = bytes;
+
+        List<{{ __element_type__ }}> set = new ArrayList<>();
+        target.{{ __collection_identifier__ }} = set;
+
+        ASN1StreamParser parser = new org.bouncycastle.asn1.ASN1StreamParser(bytes);
+        ASN1Sequence object = (ASN1Sequence)readObject(parser);
+        List list = java.util.stream.StreamSupport.stream(object.spliterator(), false)
+                                                  .collect(java.util.stream.Collectors.toList());
+
+        if (list.get(0) instanceof ASN1Sequence) {
+            for (int i=0; i<list.size(); i++) {
+                var it = (ASN1Sequence)list.get(i);
+                byte[] itemBytes = getEncoded(it);
+                {{ __element_type__ }} setItem = new {{ __element_type__ }}().decodeByteArray(itemBytes);
+
+                set.add(setItem);
+            }
+        } else {
+            byte[] itemBytes = getEncoded(object);
+            {{ __element_type__ }} setItem = new {{ __element_type__ }}().decodeByteArray(itemBytes);
+
+            set.add(setItem);
+        }
+
+        return target;
+    }
+
+}

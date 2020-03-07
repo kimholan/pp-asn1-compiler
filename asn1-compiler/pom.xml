@@ -6,7 +6,7 @@
   <parent>
     <groupId>sk.kimholan</groupId>
     <artifactId>asn1</artifactId>
-    <version>next-version</version>
+    <version>tag-release-499d90979783c42a600e4932fccd663e4bdcb8e7</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>

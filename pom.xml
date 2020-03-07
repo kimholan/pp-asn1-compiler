@@ -7,7 +7,7 @@
   <groupId>sk.kimholan</groupId>
   <artifactId>asn1</artifactId>
   <packaging>pom</packaging>
-  <version>next-version</version>
+  <version>tag-release-499d90979783c42a600e4932fccd663e4bdcb8e7</version>
 
   <modules>
     <module>asn1-antlr</module>

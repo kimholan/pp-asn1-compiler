@@ -29,7 +29,7 @@
     <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <antlr4.version>4.7.2</antlr4.version>
-    <groovy.version>2.5.9</groovy.version>
+    <groovy.version>3.0.7</groovy.version>
     <bouncycastle.version>1.64</bouncycastle.version>
     <commons-text.version>1.6</commons-text.version>
     <jinja.version>2.5.2</jinja.version>
